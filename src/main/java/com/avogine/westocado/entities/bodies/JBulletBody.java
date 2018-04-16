@@ -13,10 +13,10 @@ import org.lwjgl.assimp.AIScene;
 import org.lwjgl.assimp.AIVector3D;
 import org.lwjgl.assimp.Assimp;
 
-import com.avogine.westocado.entities.Entity;
 import com.avogine.westocado.render.data.Mesh;
 import com.avogine.westocado.render.data.VAO;
 import com.avogine.westocado.utils.math.ConversionUtils;
+import com.avogine.westocado.utils.system.AvoEvent;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.linearmath.Transform;
 
@@ -27,7 +27,7 @@ public class JBulletBody extends Body {
 	
 	private Mesh debugMesh;
 	
-	public JBulletBody(Entity entity, RigidBody rigidBody) {
+	public JBulletBody(long entity, RigidBody rigidBody) {
 		super(entity);
 		this.rigidBody = rigidBody;
 		//loadDebugMesh();
@@ -122,6 +122,12 @@ public class JBulletBody extends Body {
 	
 	public RigidBody getRigidBody() {
 		return rigidBody;
+	}
+
+	@Override
+	public void fireEvent(AvoEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

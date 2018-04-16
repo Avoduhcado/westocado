@@ -3,8 +3,10 @@ package com.avogine.westocado.setup.scene;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
-import com.avogine.westocado.entities.Camera;
-import com.avogine.westocado.entities.Entity;
+import com.avogine.westocado.entities.Entities;
+import com.avogine.westocado.entities.bodies.Body;
+import com.avogine.westocado.entities.bodies.CameraBody;
+import com.avogine.westocado.entities.models.Model;
 import com.avogine.westocado.render.shaders.VertexShader;
 
 public class VertexRender {
@@ -13,10 +15,14 @@ public class VertexRender {
 	public static final float NEAR_PLANE = 0.1f;
 	public static final float FAR_PLANE = 1000f;
 
+	private CameraBody camera;
+	
 	private VertexShader shader;
 	private Matrix4f projectionMatrix;
 
-	public VertexRender() {
+	public VertexRender(CameraBody camera) {
+		this.camera = camera;
+		
 		shader = new VertexShader("vertexShader.glsl", "fragmentShader.glsl", "position");
 		createProjectionMatrix();
 		shader.start();
@@ -24,25 +30,43 @@ public class VertexRender {
 		shader.stop();
 	}
 
-	public void render(Entity entity, Camera camera) {
-		prepareInstance(entity, camera);
-		if(entity.getBody() != null && entity.getBody().getDebugMesh() != null) {
-			entity.getBody().getDebugMesh().getVao().bind(0);
-			//GL11.glDrawElements(GL11.GL_LINE_LOOP, entity.getBody().getDebugMesh().getVao().getIndexCount(), GL11.GL_UNSIGNED_INT, 0);
-			GL11.glDrawElements(GL11.GL_TRIANGLES, entity.getBody().getDebugMesh().getVao().getIndexCount(), GL11.GL_UNSIGNED_INT, 0);
-			entity.getBody().getDebugMesh().getVao().unbind(0);
+	public void renderScene() {
+		for(Model model : Entities.modelComponentMap.values()) {
+			render(model);
 		}
+	}
+	
+	public void render(Model model) {
+		prepareInstance(model);
+		
+		// TODO Make a custom ModelComponent for this? Probably tie it to shit like the collision shape in RigidBodies?
+		Body body = Entities.bodyComponentMap.get(model.getEntity());
+		if(body == null || body.getDebugMesh() == null) {
+			return;
+		}
+		body.getDebugMesh().getVao().bind(0);
+		//GL11.glDrawElements(GL11.GL_LINE_LOOP, entity.getBody().getDebugMesh().getVao().getIndexCount(), GL11.GL_UNSIGNED_INT, 0);
+		GL11.glDrawElements(GL11.GL_TRIANGLES, body.getDebugMesh().getVao().getIndexCount(), GL11.GL_UNSIGNED_INT, 0);
+		body.getDebugMesh().getVao().unbind(0);
 		
 		finish();
 	}
 
-	private void prepareInstance(Entity entity, Camera camera) {
+	private void prepareInstance(Model model) {
 		shader.start();
 		Matrix4f transform = new Matrix4f();
-		transform.translate(entity.getBody().getPosition());
-		transform.scale(entity.getBody().getSize());
+		Body body = Entities.bodyComponentMap.get(model.getEntity());
+		if(body != null) {
+			transform.translate(body.getPosition());
+			transform.scale(body.getSize());
+		}
+		
 		shader.model.loadMatrix(transform);
-		shader.view.loadMatrix(camera.getViewMatrix());
+		if(camera != null) {
+			shader.view.loadMatrix(camera.getViewMatrix());
+		} else {
+			shader.view.loadMatrix(new Matrix4f());
+		}
 		shader.color.loadVec3(1, 0, 0);
 	}
 
@@ -54,6 +78,14 @@ public class VertexRender {
 		shader.cleanUp();
 	}
 
+	public void setCameraEntity(CameraBody camera) {
+		if(camera == null || !(camera instanceof CameraBody)) {
+			System.err.println("Invalid camera entity, make sure to implement the CameraBody before setting it to renderer.");
+			return;
+		}
+		this.camera = camera;
+	}
+	
 	private void createProjectionMatrix() {
 		projectionMatrix = new Matrix4f();
 		float aspectRatio = (float) 1280 / (float) 720;

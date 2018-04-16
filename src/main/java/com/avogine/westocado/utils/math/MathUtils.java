@@ -4,8 +4,6 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import com.avogine.westocado.entities.Camera;
-
 public class MathUtils {
 
 	public static float barryCentric(Vector3f p1, Vector3f p2, Vector3f p3, Vector2f pos) {
@@ -27,13 +25,6 @@ public class MathUtils {
 		return new Matrix4f()
 				.translate(translation.x, translation.y, 0)
 				.scale(new Vector3f(scale.x, scale.y, 1f));
-	}
-
-	public static Matrix4f createViewMatrix(Camera camera) {
-		return new Matrix4f()
-				/*.rotateX((float) Math.toRadians(camera.getPitch()))
-				.rotateY((float) Math.toRadians(camera.getYaw()))
-				.translate(camera.getPosition().negate(new Vector3f()))*/;
 	}
 
 	public static float clamp(float value, float min, float max) {

@@ -4,7 +4,6 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
 import com.avogine.westocado.Theater;
-import com.avogine.westocado.entities.Entity;
 import com.avogine.westocado.entities.bodies.JBulletBody;
 import com.avogine.westocado.entities.bodies.utils.JBulletBodyParams;
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
@@ -65,7 +64,7 @@ public class JBulletPhysics extends PhysicsController<JBulletBody, JBulletBodyPa
 	}
 	
 	@Override
-	public JBulletBody createBody(Entity entity, JBulletBodyParams params) {
+	public JBulletBody createBody(long entity, JBulletBodyParams params) {
 		CollisionShape shape = params.getShape();
 		
 		Transform transform = new Transform();

@@ -4,11 +4,13 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 
 import com.avogine.westocado.io.Window;
+import com.avogine.westocado.io.utils.TimeEvent;
+import com.avogine.westocado.system.TimeWizard;
 import com.avogine.westocado.utils.system.WindowManager;
 
 public class Theater {
 
-	public static final boolean bullshit = false;
+	public static final boolean wireFrame = false;
 
 	private Window window;
 	
@@ -55,6 +57,7 @@ public class Theater {
 	private void doFps() {
 		currentTime = getTime();
 		delta = currentTime - lastTime;
+		TimeWizard.fireEvent(new TimeEvent(delta));
 		lastTime = currentTime;
 		frameTime += delta;
 		if(frameTime >= 1.0) {

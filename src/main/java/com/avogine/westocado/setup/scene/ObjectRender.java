@@ -1,11 +1,16 @@
 package com.avogine.westocado.setup.scene;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
-import com.avogine.westocado.entities.Camera;
-import com.avogine.westocado.entities.Entity;
-import com.avogine.westocado.entities.Light;
+import com.avogine.westocado.entities.Entities;
+import com.avogine.westocado.entities.bodies.Body;
+import com.avogine.westocado.entities.bodies.CameraBody;
+import com.avogine.westocado.entities.components.LightEmitter;
+import com.avogine.westocado.entities.models.Model;
 import com.avogine.westocado.render.data.Mesh;
 import com.avogine.westocado.render.shaders.ObjectShader;
 
@@ -14,61 +19,100 @@ public class ObjectRender {
 	// TODO: Put these somewhere better, geez
 	public static final float FOV = 70;
 	public static final float NEAR_PLANE = 0.1f;
-	public static final float FAR_PLANE = 10000f;
+	public static final float FAR_PLANE = Float.MAX_VALUE;
 
+	private CameraBody camera;
+	
 	private ObjectShader shader;
 	private Matrix4f projectionMatrix;
 
-	public ObjectRender() {
+	public ObjectRender(CameraBody camera) {
+		this.camera = camera;
+		
 		shader = new ObjectShader("diffuseVertShader.glsl", "diffuseFragShader.glsl", "position", "color", "textureCoords", "normals");
 		createProjectionMatrix();
 		shader.start();
 		shader.projection.loadMatrix(projectionMatrix);
 		shader.stop();
 	}
-
-	public void render(Entity entity, Camera camera, Light light) {
-		prepareInstance(entity, camera, light);
+	
+	public void renderScene() {
+		for(Model model : Entities.modelComponentMap.values()) {
+			render(model);
+		}
+	}
+	
+	public void render(Model model) {
+		prepareInstance(model);
 		
-		for(Mesh mesh : entity.getModel().getMeshes()) {
-			entity.getModel().getTexture().bindToUnit(0);
+		// TODO Batch it baby, grab all the same meshes and render them at a time
+		for(Mesh mesh : model.getMeshes()) {
+			model.getTexture().bindToUnit(0);
 			mesh.getVao().bind(0, 1, 2, 3);
 
 			GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.getVao().getIndexCount(), GL11.GL_UNSIGNED_INT, 0);
 			mesh.getVao().unbind(0, 1, 2, 3);
 		}
-		
-		/*// TODO Batch it baby, grab all the same meshes and render them at a time
-		entity.getModel().getTexture().bindToUnit(0);
-		//entity.getModel().getTexture2().bindToUnit(1);
-		entity.getModel().getMesh().getVao().bind(0, 1, 2, 3);
 
-		GL11.glDrawElements(GL11.GL_TRIANGLES, entity.getModel().getMesh().getVao().getIndexCount(), GL11.GL_UNSIGNED_INT, 0);
-		entity.getModel().getMesh().getVao().unbind(0, 1, 2, 3);
-		if(entity.getBody() != null) {
-						entity.getBody().getDebugMesh().getVao().bind(0);
-						GL11.glDrawElements(GL11.GL_LINE_LOOP, entity.getBody().getDebugMesh().getVao().getIndexCount(), GL11.GL_UNSIGNED_INT, 0);
-						entity.getBody().getDebugMesh().getVao().unbind(0);
-					}
-		*/
 		finish();
 	}
 
-	private void prepareInstance(Entity entity, Camera camera, Light light) {
+	private void prepareInstance(Model model) {
 		shader.start();
 		Matrix4f transform = new Matrix4f();
-		// TODO Organize all this stuff to get proper model view transformations
-		transform.translate(entity.getPosition());
-		/*if(entity.getRotateDegree() != -1) {
-			entity.setRotateDegree(entity.getRotateDegree() + Theater.getDeltaChange(1f));
-			transform.rotate(entity.getRotateDegree(), entity.getRotation());
-		}*/
-		transform.scale(entity.getScale());
-		//transform.translate(new Vector3f(0, -5f, 0));
-		shader.lightPosition.loadVec3(light.getPosition());
-		shader.lightColor.loadVec3(light.getColor());
+		Body modelBody = Entities.bodyComponentMap.get(model.getEntity());
+		if(modelBody != null) {
+			// TODO Organize all this stuff to get proper model view transformations
+			transform.translate(modelBody.getPosition());
+			transform.scale(modelBody.getScale());			
+		}
+		
+		shader.materialShininess.loadFloat(10f);
+		shader.materialSpecularColor.loadVec3(1, 1, 1);
+		
+		// Grab ALL the lights we got (but only up to our max)
+		List<LightEmitter> lights = Entities.lightComponentMap.values().stream()
+				.limit(ObjectShader.MAX_LIGHTS)
+				.collect(Collectors.toList());
+		// Pass the baby UP
+		shader.numLights.loadFloat(lights.size());
+		for(int i = 0; i < ObjectShader.MAX_LIGHTS; i++) {
+			// As long as we have lights, set those values to GO
+			if(i < lights.size()) {
+				LightEmitter light = Entities.lightComponentMap.get(lights.get(i).getEntity());
+				
+				Body body = Entities.bodyComponentMap.get(light.getEntity());
+				// I HOPE we have a body for each light but u nvr no dood
+				if(body != null) {
+					shader.lightPositions[i].loadVec4(body.getPosition().x, body.getPosition().y, body.getPosition().z, 0);
+				} else {
+					shader.lightPositions[i].loadVec4(0, 0, 0, 0);
+				}
+				
+				shader.lightIntensities[i].loadVec3(light.getColor());
+				shader.lightAttenuations[i].loadFloat(light.getAttenuation());
+				shader.lightAmbientCoefficients[i].loadFloat(light.getAmbientCoefficient());
+				shader.lightConeAngles[i].loadFloat(light.getConeAngle());
+				shader.lightConeDirections[i].loadVec3(light.getConeDirection());
+			} else {
+				// Load up some bots if we ran out
+				shader.lightPositions[i].loadVec4(0, 0, 0, 0);
+				shader.lightIntensities[i].loadVec3(0, 0, 0);
+				shader.lightAttenuations[i].loadFloat(0);
+				shader.lightAmbientCoefficients[i].loadFloat(0);
+				shader.lightConeAngles[i].loadFloat(0);
+				shader.lightConeDirections[i].loadVec3(0, 0, 0);
+			}
+		}
+		
 		shader.model.loadMatrix(transform);
-		shader.view.loadMatrix(camera.getViewMatrix());
+		if(camera != null) {
+			shader.view.loadMatrix(camera.getViewMatrix());
+			shader.cameraPosition.loadVec3(camera.getPosition());
+		} else {
+			shader.view.loadMatrix(new Matrix4f());
+			shader.cameraPosition.loadVec3(0, 0, 0);
+		}
 	}
 
 	public void finish() {
@@ -79,6 +123,14 @@ public class ObjectRender {
 		shader.cleanUp();
 	}
 
+	public void setCameraEntity(CameraBody camera) {
+		if(camera == null || !(camera instanceof CameraBody)) {
+			System.err.println("Invalid camera entity, make sure to implement the CameraBody before setting it to renderer.");
+			return;
+		}
+		this.camera = camera;
+	}
+	
 	private void createProjectionMatrix() {
 		projectionMatrix = new Matrix4f();
 		float aspectRatio = (float) 1280 / (float) 720;

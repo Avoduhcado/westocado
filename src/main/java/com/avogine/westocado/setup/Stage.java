@@ -1,30 +1,27 @@
 package com.avogine.westocado.setup;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.vecmath.Quat4f;
 
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 
-import com.avogine.westocado.entities.Camera;
-import com.avogine.westocado.entities.Entity;
-import com.avogine.westocado.entities.Light;
+import com.avogine.westocado.Theater;
+import com.avogine.westocado.entities.Entities;
+import com.avogine.westocado.entities.bodies.CameraBody;
 import com.avogine.westocado.entities.bodies.JBulletBody;
+import com.avogine.westocado.entities.bodies.PlainBody;
 import com.avogine.westocado.entities.bodies.utils.JBulletBodyParams;
+import com.avogine.westocado.entities.components.LightEmitter;
+import com.avogine.westocado.entities.controllers.CameraController;
+import com.avogine.westocado.entities.models.PlainModel;
 import com.avogine.westocado.entities.utils.EntityContainer;
 import com.avogine.westocado.io.Window;
-import com.avogine.westocado.render.shaders.SimpleShader;
 import com.avogine.westocado.render.utils.FBO;
 import com.avogine.westocado.render.utils.PostProcessor;
 import com.avogine.westocado.setup.physics.JBulletPhysics;
 import com.avogine.westocado.setup.physics.PhysicsController;
-import com.avogine.westocado.setup.scene.ModelRender;
 import com.avogine.westocado.setup.scene.ObjectRender;
-import com.avogine.westocado.setup.scene.SkyboxRender;
 import com.avogine.westocado.setup.scene.VertexRender;
 import com.avogine.westocado.utils.math.BTUtils;
 import com.bulletphysics.collision.shapes.SphereShape;
@@ -44,64 +41,71 @@ public class Stage implements EntityContainer {
 	public static final float GREEN = 0.62f;
 	public static final float BLUE = 0.69f;*/
 	
-	private Matrix4f projectionMatrix;
-	
-	private ModelRender modelRender;
-	private SkyboxRender skyboxRender;
-	
-	private SimpleShader simpleShader;
+	private Window window;
 	
 	private FBO entityFbo;
 	private FBO outputFbo;
 	
 	private ObjectRender render;
 	private VertexRender vRender;
-	private Camera camera;
-	private Light light;
 	
 	private PhysicsController<JBulletBody, JBulletBodyParams> physics = new JBulletPhysics();
 	
-	private List<Entity> entities = new ArrayList<>();
-	
 	public Stage(Window window) {
+		this.window = window;
 		physics = new JBulletPhysics();
 		
 		entityFbo = new FBO(1280, 720, window);
 		outputFbo = new FBO(1280, 720, FBO.DEPTH_TEXTURE, window);
 		PostProcessor.init(window);
 		
-		this.camera = new Camera(this);
-		window.getInput().addInputListener(camera);
-		this.light = new Light(new Vector3f(0, 25, 25), new Vector3f(1, 1, 1));
-		this.render = new ObjectRender();
-		this.vRender = new VertexRender();
+		long cameraEntity = Entities.reserveNewEntity();
+		new CameraController(cameraEntity, window);
+		new LightEmitter(cameraEntity, new Vector3f(0.9f, 0.3f, 0.1f));
+		CameraBody mainCamera = new CameraBody(cameraEntity);
+
+		// TODO Could probably wrap these up inside some sort of full renderer to cut down on code duplication
+		this.render = new ObjectRender(mainCamera);
+		this.vRender = new VertexRender(mainCamera);
 		
-		entities.add(new Entity(this));
-		entities.add(new Entity(this, "robutt7.obj", "robuttUVflat"));
+		// This is all garbo entity creation and should DEFO be hid behind a level loader
+		long entity = Entities.reserveNewEntity();
 		JBulletBodyParams bodyParams = new JBulletBodyParams(new SphereShape(1), BTUtils.vector3f(0, 50, 0), new Quat4f(0, 0, 0, 1));
-		entities.get(entities.size() - 1).setBody(physics.createBody(entities.get(entities.size() - 1), bodyParams));
-		entities.add(new Entity(this, "cairn.obj", "grass"));
-		entities.get(entities.size() - 1).setPosition(new Vector3f(10, 0, 10));
-		entities.add(new Entity(this, "bigTree2.obj", "Dyed_Grey_Sycamore"));
-		entities.get(entities.size() - 1).setScale(new Vector3f(100f));
-		entities.get(entities.size() - 1).setPosition(new Vector3f(10, 0, -500));
+		physics.createBody(entity, bodyParams);
+		new PlainModel(entity, "robutt7.obj", "robuttUVflat");
+		
+		entity = Entities.reserveNewEntity();
+		new PlainModel(entity, "cairn.obj", "grass");
+		PlainBody body = new PlainBody(entity);
+		body.setPosition(new Vector3f(10, 0, 10));
+		
+		entity = Entities.reserveNewEntity();
+		new PlainModel(entity, "bigTree2.obj", "Dyed_Grey_Sycamore");
+		body = new PlainBody(entity);
+		body.setPosition(new Vector3f(10, 0, -500));
+		body.setScale(new Vector3f(100f));
+		
+		entity = Entities.reserveNewEntity();
+		body = new PlainBody(entity);
+		body.setPosition(new Vector3f(0, 25, 25));
+		new LightEmitter(entity, new Vector3f(0.1f, 0.8f, 0f));
 	}
 
 	/**
 	 * Renders the scene to the screen.
-	 * @param scene
 	 */
 	public void render() {
 		prepare();
-		camera.move();
-		light.setPosition(camera.getPosition());
-		//light.move();
 		entityFbo.bindFrameBuffer();
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-		//GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
-		entities.stream().filter(e -> e.getModel() != null).forEach(e -> render.render(e, camera, light));
-		entities.stream().filter(e -> e.getBody() != null).forEach(e -> vRender.render(e, camera));
-		//GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
+		if(Theater.wireFrame) {
+			GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
+		}
+		render.renderScene();
+		vRender.renderScene();
+		if(Theater.wireFrame) {
+			GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
+		}
 		entityFbo.unbindFrameBuffer();
 		entityFbo.resolveToFbo(GL30.GL_COLOR_ATTACHMENT0, outputFbo);
 		entityFbo.resolveToFbo(GL30.GL_DEPTH_ATTACHMENT, outputFbo);
@@ -135,14 +139,13 @@ public class Stage implements EntityContainer {
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 	}
 	
-	@Override
-	public PhysicsController<JBulletBody, JBulletBodyParams> getPhysics() {
-		return physics;
+	public Window getWindow() {
+		return window;
 	}
 	
 	@Override
-	public void addEntity(Entity entity) {
-		this.entities.add(entity);
+	public PhysicsController<JBulletBody, JBulletBodyParams> getPhysics() {
+		return physics;
 	}
 	
 }

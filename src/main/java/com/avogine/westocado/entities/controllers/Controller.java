@@ -1,11 +1,10 @@
 package com.avogine.westocado.entities.controllers;
 
-import com.avogine.westocado.entities.Entity;
 import com.avogine.westocado.entities.components.EntityComponent;
 
 public abstract class Controller extends EntityComponent {
-
-	public Controller(Entity entity) {
+	
+	public Controller(long entity) {
 		super(entity);
 	}
 	

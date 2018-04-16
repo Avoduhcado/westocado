@@ -2,18 +2,17 @@ package com.avogine.westocado.entities.bodies;
 
 import org.joml.Vector3f;
 
-import com.avogine.westocado.entities.Entity;
 import com.avogine.westocado.entities.components.EntityComponent;
 import com.avogine.westocado.render.data.Mesh;
 
 public abstract class Body extends EntityComponent {
-	
+		
 	protected Vector3f position = new Vector3f();
 	protected Vector3f scale = new Vector3f(1);
 	
 	protected boolean insideFrustum;
 	
-	public Body(Entity entity) {
+	public Body(long entity) {
 		super(entity);
 	}
 	

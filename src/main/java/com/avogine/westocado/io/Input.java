@@ -24,6 +24,7 @@ public class Input {
 	private long window;
 	
 	private boolean[] keys;
+	private boolean[] mouseButtonDelays;
 	
 	private double mouseX;
 	private double mouseY;
@@ -31,8 +32,6 @@ public class Input {
 	private double mouseDY;
 	private double mouseWheelDX;
 	private double mouseWheelDY;
-	
-	private boolean mousePressDelay = false;
 	
 	private List<InputListener> inputListeners = new ArrayList<>();
 	
@@ -42,6 +41,9 @@ public class Input {
 		this.window = window;
 		this.keys = new boolean[GLFW.GLFW_KEY_LAST];
 		Arrays.fill(keys, false);
+		
+		this.mouseButtonDelays = new boolean[GLFW.GLFW_MOUSE_BUTTON_LAST];
+		Arrays.fill(mouseButtonDelays, false);
 
 		double[] mX = new double[1];
 		double[] mY = new double[1];
@@ -97,14 +99,13 @@ public class Input {
 			mouseWheelDY = y;
 		});
 		
-		//GLFW.glfwSetInputMode(window, GLFW.GLFW_STICKY_MOUSE_BUTTONS, GLFW.GLFW_TRUE);
 		GLFW.glfwSetMouseButtonCallback(window, (w, button, action, mods) -> {
 			if(button == 0 && action == GLFW.GLFW_PRESS && GLFW.glfwGetInputMode(window, GLFW.GLFW_CURSOR) != GLFW.GLFW_CURSOR_DISABLED) {
 				GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
 			}
 			
 			if(action == GLFW.GLFW_PRESS) {
-				mousePressDelay = true;
+				mouseButtonDelays[button] = true;
 			}
 			
 			fireMouseButtonEvent(new MouseButtonInputEvent(getMouseButtonEventType(action), button));
@@ -214,21 +215,24 @@ public class Input {
 	}
 	
 	public void update() {
-		// Keys start at GLFW_KEY_SPACE
-		/*for(int i = GLFW.GLFW_KEY_SPACE; i < keys.length; i++) {
-			keys[i] = isKeyDown(i);
-		}*/
-		
 		mouseDX = 0;
 		mouseDY = 0;
 		mouseWheelDX = 0;
 		mouseWheelDY = 0;
 		
-		// TODO This only detects left clicks
-		if(isMouseButtonDown(GLFW.GLFW_MOUSE_BUTTON_LEFT) && !mousePressDelay) {
-			fireMouseButtonEvent(new MouseButtonInputEvent(MouseButtonInputEvent.MOUSE_HELD, GLFW.GLFW_MOUSE_BUTTON_LEFT));
-		} else if(isMouseButtonDown(GLFW.GLFW_MOUSE_BUTTON_LEFT)) {
-			mousePressDelay = false;
+		for(int i = GLFW.GLFW_MOUSE_BUTTON_1; i < GLFW.GLFW_MOUSE_BUTTON_LAST; i++) {
+			if(isMouseButtonDown(i) && !mouseButtonDelays[i]) {
+				fireMouseButtonEvent(new MouseButtonInputEvent(MouseButtonInputEvent.MOUSE_HELD, i));
+			} else if(isMouseButtonDown(i)) {
+				mouseButtonDelays[i] = false;
+			}
+		}
+		
+		// Key_Repeat has god awful lag, so we're gonna roll our own keyDown events
+		for(int i = GLFW.GLFW_KEY_SPACE; i < keys.length; i++) {
+			if(isKeyDown(i)) {
+				fireKeyInput(new KeyInputEvent(KeyInputEvent.KEY_HELD, i));
+			}
 		}
 	}
 	

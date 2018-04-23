@@ -6,33 +6,32 @@ import org.lwjgl.opengl.GL30;
 
 import com.avogine.westocado.io.Window;
 import com.avogine.westocado.render.data.Mesh;
-import com.avogine.westocado.render.data.VAO;
-import com.avogine.westocado.utils.loader.TextureLoader;
 
 public class PostProcessor {
 	
-	private static final float[] POSITIONS = { -1, 1, -1, -1, 1, 1, 1, -1 };	
+	private static final float[] POSITIONS = { -1, 1, 1, -1, -1, 1, 1, 1, 1, 1, -1, 1 };	
 	private static Mesh quad;
 	
-	private static OutlineFilter outlineFilter;
+	/*private static OutlineFilter outlineFilter;
 	private static CombineFilter combineFilter;
-	private static HatchingFilter hatchingFilter;
+	private static HatchingFilter hatchingFilter;*/
 	
 	private static ScreenFilter screenFilter;
 	
-	private static int hatchTexture;
+	//private static int hatchTexture;
 	
 	public static void init(Window window) {
-		VAO vao = VAO.create();
+		/*VAO vao = VAO.create();
 		vao.bind(0);
 		vao.createAttribute(0, POSITIONS, 2);
-		vao.unbind(0);
-		quad = new Mesh(vao);
+		vao.unbind(0);*/
+		quad = new Mesh(POSITIONS, new float[0], new float[0], new int[0]);
+		//quad = new Mesh(vao);
 		
-		outlineFilter = new OutlineFilter(1280, 720, window);
+		/*outlineFilter = new OutlineFilter(1280, 720, window);
 		combineFilter = new CombineFilter();
 		hatchingFilter = new HatchingFilter();
-		hatchTexture = TextureLoader.loadTexture("default35").getId();
+		hatchTexture = TextureLoader.loadTexture("default35").getId();*/
 		
 		screenFilter = new ScreenFilter();
 	}
@@ -47,9 +46,9 @@ public class PostProcessor {
 	}
 	
 	public static void cleanUp() {
-		outlineFilter.cleanUp();
+		/*outlineFilter.cleanUp();
 		combineFilter.cleanUp();
-		hatchingFilter.cleanUp();
+		hatchingFilter.cleanUp();*/
 		screenFilter.cleanUp();
 	}
 	

@@ -24,7 +24,6 @@ uniform struct Light {
 
 in vec3 fragVert;
 in vec2 fragTextureCoords;
-in vec3 fragColor;
 in vec3 fragNormal;
 
 out vec4 finalColor;

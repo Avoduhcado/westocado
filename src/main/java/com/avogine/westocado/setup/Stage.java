@@ -55,8 +55,8 @@ public class Stage implements EntityContainer {
 		this.window = window;
 		physics = new JBulletPhysics();
 		
-		entityFbo = new FBO(1280, 720, window);
-		outputFbo = new FBO(1280, 720, FBO.DEPTH_TEXTURE, window);
+		entityFbo = new FBO(window.getFbWidth(), window.getFbHeight(), window);
+		outputFbo = new FBO(window.getFbWidth(), window.getFbHeight(), FBO.DEPTH_TEXTURE, window);
 		PostProcessor.init(window);
 		
 		long cameraEntity = Entities.reserveNewEntity();
@@ -72,15 +72,15 @@ public class Stage implements EntityContainer {
 		long entity = Entities.reserveNewEntity();
 		JBulletBodyParams bodyParams = new JBulletBodyParams(new SphereShape(1), BTUtils.vector3f(0, 50, 0), new Quat4f(0, 0, 0, 1));
 		physics.createBody(entity, bodyParams);
-		new PlainModel(entity, "robutt7.obj", "robuttUVflat");
+		new PlainModel(entity, "robutt.obj");
 		
 		entity = Entities.reserveNewEntity();
-		new PlainModel(entity, "cairn.obj", "grass");
+		new PlainModel(entity, "cairn.obj");
 		PlainBody body = new PlainBody(entity);
 		body.setPosition(new Vector3f(10, 0, 10));
 		
 		entity = Entities.reserveNewEntity();
-		new PlainModel(entity, "bigTree2.obj", "Dyed_Grey_Sycamore");
+		new PlainModel(entity, "bigTree2.obj");
 		body = new PlainBody(entity);
 		body.setPosition(new Vector3f(10, 0, -500));
 		body.setScale(new Vector3f(100f));
@@ -109,7 +109,8 @@ public class Stage implements EntityContainer {
 		entityFbo.unbindFrameBuffer();
 		entityFbo.resolveToFbo(GL30.GL_COLOR_ATTACHMENT0, outputFbo);
 		entityFbo.resolveToFbo(GL30.GL_DEPTH_ATTACHMENT, outputFbo);
-
+		//entityFbo.resolveToScreen();
+		
 		PostProcessor.doPostProcessing(outputFbo.getColorTexture(), outputFbo.getDepthTexture());
 	}
 	
@@ -146,6 +147,12 @@ public class Stage implements EntityContainer {
 	@Override
 	public PhysicsController<JBulletBody, JBulletBodyParams> getPhysics() {
 		return physics;
+	}
+
+	public void resizeFBOs() {
+		// TODO This could use some work, also FBOs exist in the PostProcessor, so that needs implemented too
+		entityFbo = new FBO(window.getFbWidth(), window.getFbHeight(), window);
+		outputFbo = new FBO(window.getFbWidth(), window.getFbHeight(), FBO.DEPTH_TEXTURE, window);
 	}
 	
 }

@@ -64,6 +64,8 @@ public class Texture {
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 		} catch(IOException e) {
 			e.printStackTrace();
+		} catch(IllegalArgumentException e) {
+			System.err.println("Error reading texture at: " + ref);
 		} finally {
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}

@@ -1,35 +1,28 @@
 package com.avogine.westocado.entities.models;
 
-import java.io.FileNotFoundException;
-import java.util.List;
-
 import com.avogine.westocado.render.data.Mesh;
-import com.avogine.westocado.render.data.Texture;
-import com.avogine.westocado.utils.loader.ModelLoader;
-import com.avogine.westocado.utils.loader.TextureLoader;
+import com.avogine.westocado.utils.loader.StaticMeshesLoader;
 import com.avogine.westocado.utils.system.AvoEvent;
 
 public class PlainModel extends Model {
 
-	private List<Mesh> meshList;
-	private Texture texture;
-	private Texture texture2;
+	//private List<Mesh> meshList;
+	private Mesh[] meshList;
 	
-	public PlainModel(long entity, String modelName, String textureName) {
+	public PlainModel(long entity, String modelName) {
 		super(entity);
 		try {
-			meshList = ModelLoader.loadAIModel(modelName);
-		} catch (FileNotFoundException e) {
+			meshList = StaticMeshesLoader.load(modelName);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		texture = TextureLoader.loadTexture(textureName);
 	}
 	
 	public Mesh getMesh() {
-		return meshList.get(0);
+		return meshList[0];
 	}
 	
-	public List<Mesh> getMeshes() {
+	public Mesh[] getMeshes() {
 		return meshList;
 	}
 	
@@ -37,18 +30,6 @@ public class PlainModel extends Model {
 		//this.mesh = mesh;
 	}
 	
-	public Texture getTexture() {
-		return texture;
-	}
-	
-	public void setTexture(Texture texture) {
-		this.texture = texture;
-	}
-	
-	public Texture getTexture2() {
-		return texture2;
-	}
-
 	@Override
 	public void fireEvent(AvoEvent e) {
 		// TODO Auto-generated method stub

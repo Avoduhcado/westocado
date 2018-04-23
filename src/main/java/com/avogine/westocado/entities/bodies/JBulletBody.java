@@ -15,6 +15,7 @@ import org.lwjgl.assimp.Assimp;
 
 import com.avogine.westocado.render.data.Mesh;
 import com.avogine.westocado.render.data.VAO;
+import com.avogine.westocado.utils.loader.StaticMeshesLoader;
 import com.avogine.westocado.utils.math.ConversionUtils;
 import com.avogine.westocado.utils.system.AvoEvent;
 import com.bulletphysics.dynamics.RigidBody;
@@ -32,7 +33,12 @@ public class JBulletBody extends Body {
 		this.rigidBody = rigidBody;
 		//loadDebugMesh();
 		//loadAssimpDebugMesh();
-		loadMesh();
+		//loadMesh();
+		try {
+			debugMesh = StaticMeshesLoader.load("testsphere.nff")[0];
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Override
@@ -107,7 +113,7 @@ public class JBulletBody extends Body {
 		vao.createIndexBuffer(indices);
 		vao.unbind(0);
 		
-		debugMesh = new Mesh(vao);
+		//debugMesh = new Mesh(vao);
 	}
 	
 	@Override

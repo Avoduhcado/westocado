@@ -21,7 +21,6 @@ public class ObjectShader extends ShaderProgram {
 	public UniformMatrix projection = new UniformMatrix("projection");
 	public UniformMatrix view = new UniformMatrix("view");
 	public UniformSampler texture = new UniformSampler("tex");
-	public UniformSampler texture2 = new UniformSampler("tex2");
 	public UniformVec3 cameraPosition = new UniformVec3("cameraPosition");
 	public UniformFloat materialShininess = new UniformFloat("materialShininess");
 	public UniformVec3 materialSpecularColor = new UniformVec3("materialSpecularColor");
@@ -46,7 +45,7 @@ public class ObjectShader extends ShaderProgram {
 		}
 		// WEW
 		List<Uniform> uniformList = new ArrayList<>();
-		uniformList.addAll(Arrays.asList(projection, view, model, texture, texture2, cameraPosition, materialShininess, materialSpecularColor, numLights));
+		uniformList.addAll(Arrays.asList(projection, view, model, texture, cameraPosition, materialShininess, materialSpecularColor, numLights));
 		uniformList.addAll(Arrays.asList(lightPositions));
 		uniformList.addAll(Arrays.asList(lightIntensities));
 		uniformList.addAll(Arrays.asList(lightAttenuations));
@@ -60,7 +59,6 @@ public class ObjectShader extends ShaderProgram {
 	private void connectTextureUnits() {
 		super.start();
 		texture.loadTexUnit(DIFFUSE_TEX_UNIT);
-		texture2.loadTexUnit(1);
 		super.stop();
 	}
 	

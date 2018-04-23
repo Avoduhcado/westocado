@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
 
 import com.avogine.westocado.entities.Entities;
 import com.avogine.westocado.entities.bodies.Body;
@@ -29,7 +28,7 @@ public class ObjectRender {
 	public ObjectRender(CameraBody camera) {
 		this.camera = camera;
 		
-		shader = new ObjectShader("diffuseVertShader.glsl", "diffuseFragShader.glsl", "position", "color", "textureCoords", "normals");
+		shader = new ObjectShader("diffuseVertShader.glsl", "diffuseFragShader.glsl", "position", "textureCoords", "normals");
 		createProjectionMatrix();
 		shader.start();
 		shader.projection.loadMatrix(projectionMatrix);
@@ -47,12 +46,15 @@ public class ObjectRender {
 		
 		// TODO Batch it baby, grab all the same meshes and render them at a time
 		for(Mesh mesh : model.getMeshes()) {
+			mesh.render();
+		}
+		/*for(Mesh mesh : model.getMeshes()) {
 			model.getTexture().bindToUnit(0);
 			mesh.getVao().bind(0, 1, 2, 3);
 
 			GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.getVao().getIndexCount(), GL11.GL_UNSIGNED_INT, 0);
 			mesh.getVao().unbind(0, 1, 2, 3);
-		}
+		}*/
 
 		finish();
 	}

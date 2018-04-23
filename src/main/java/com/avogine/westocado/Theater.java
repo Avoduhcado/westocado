@@ -44,9 +44,9 @@ public class Theater {
 		
 		while(!window.shouldClose()) {
 			doFps();
-			
-			window.render();
+
 			window.update();
+			window.render();
 
 			doSync();
 		}

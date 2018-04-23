@@ -7,46 +7,55 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.AIColor4D;
 import org.lwjgl.assimp.AIFace;
+import org.lwjgl.assimp.AIMaterial;
 import org.lwjgl.assimp.AIMesh;
 import org.lwjgl.assimp.AIScene;
+import org.lwjgl.assimp.AIString;
 import org.lwjgl.assimp.AIVector3D;
 import org.lwjgl.assimp.Assimp;
 
+import com.avogine.westocado.render.data.Material;
 import com.avogine.westocado.render.data.Mesh;
+import com.avogine.westocado.render.data.Texture;
 import com.avogine.westocado.render.data.VAO;
+import com.avogine.westocado.render.utils.TextureCache;
 
 public class ModelLoader {
 
-	private static final String RES_LOC = "models/";
+	private static final String MODEL_LOCATION = "models/";
+	private static final String TEXTURE_LOCATION = "graphics/";
 
-	/**
-	 * 
-	 * @param filename
-	 * @throws FileNotFoundException
-	 */
 	public static List<Mesh> loadAIModel(String filename) throws FileNotFoundException {
-		File assimpFile = new File(ClassLoader.getSystemResource(RES_LOC + filename).getFile());
+		// TODO Don't package resources with jar, OR look into why Assimp won't load files from the jar (prolly the former TBH)
+		File assimpFile = new File(ClassLoader.getSystemResource(MODEL_LOCATION + filename).getFile());
 		if(!assimpFile.exists()) {
-			throw new FileNotFoundException();
+			throw new FileNotFoundException("No such file at " + MODEL_LOCATION + filename);
 		}
 
-		AIScene modelScene = Assimp.aiImportFile(assimpFile.getAbsolutePath(), Assimp.aiProcessPreset_TargetRealtime_MaxQuality);
-		if(modelScene == null) {
+		AIScene aiScene = Assimp.aiImportFile(assimpFile.getAbsolutePath(), Assimp.aiProcess_JoinIdenticalVertices | Assimp.aiProcess_Triangulate | Assimp.aiProcess_FixInfacingNormals);
+		if(aiScene == null) {
 			throw new NullPointerException("The loaded file did not contain a transformable mesh");
 		}
 
-		int numMeshes = modelScene.mNumMeshes();
-		PointerBuffer aiMeshes = modelScene.mMeshes();
+		int numMeshes = aiScene.mNumMeshes();
+		PointerBuffer aiMeshes = aiScene.mMeshes();
 		AIMesh[] meshes = new AIMesh[numMeshes];
 		for(int i = 0; i < numMeshes; i++) {
 			meshes[i] = AIMesh.create(aiMeshes.get(i));
 		}
 
-		// TODO Materials
+		int numMaterials = aiScene.mNumMaterials();
+		PointerBuffer aiMaterials = aiScene.mMaterials();
+		List<Material> materials = new ArrayList<>();
+		for (int i = 0; i < numMaterials; i++) {
+		    AIMaterial aiMaterial = AIMaterial.create(aiMaterials.get(i));
+		    processMaterial(aiMaterial, materials, TEXTURE_LOCATION);
+		}
 		// TODO Textures
 		
 		List<Mesh> meshList = new ArrayList<>();
@@ -57,6 +66,41 @@ public class ModelLoader {
 		return meshList;
 	}
 
+	private static void processMaterial(AIMaterial aiMaterial, List<Material> materials, String texturesDir) {
+	    AIColor4D color = AIColor4D.create();
+
+	    AIString path = AIString.calloc();
+	    Assimp.aiGetMaterialTexture(aiMaterial, Assimp.aiTextureType_DIFFUSE, 0, path, (IntBuffer) null, null, null, null, null, null);
+	    String texturePath = path.dataString();
+	    Texture texture = null;
+	    if (texturePath != null && texturePath.length() > 0) {
+	        TextureCache textCache = TextureCache.getInstance();
+	        texture = textCache.getTexture(texturesDir + texturePath);
+	    }
+
+	    Vector4f ambient = Material.DEFAULT_COLOR;
+	    int result = Assimp.aiGetMaterialColor(aiMaterial, Assimp.AI_MATKEY_COLOR_AMBIENT, Assimp.aiTextureType_NONE, 0, color);
+	    if (result == 0) {
+	        ambient = new Vector4f(color.r(), color.g(), color.b(), color.a());
+	    }
+
+	    Vector4f diffuse = Material.DEFAULT_COLOR;
+	    result = Assimp.aiGetMaterialColor(aiMaterial, Assimp.AI_MATKEY_COLOR_DIFFUSE, Assimp.aiTextureType_NONE, 0, color);
+	    if (result == 0) {
+	        diffuse = new Vector4f(color.r(), color.g(), color.b(), color.a());
+	    }
+
+	    Vector4f specular = Material.DEFAULT_COLOR;
+	    result = Assimp.aiGetMaterialColor(aiMaterial, Assimp.AI_MATKEY_COLOR_SPECULAR, Assimp.aiTextureType_NONE, 0, color);
+	    if (result == 0) {
+	        specular = new Vector4f(color.r(), color.g(), color.b(), color.a());
+	    }
+
+	    Material material = new Material(ambient, diffuse, specular, 1.0f);
+	    material.setTexture(texture);
+	    materials.add(material);
+	}
+	
 	/**
 	 * 
 	 * @param mesh

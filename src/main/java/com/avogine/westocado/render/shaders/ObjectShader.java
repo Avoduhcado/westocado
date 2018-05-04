@@ -7,6 +7,7 @@ import java.util.List;
 import com.avogine.westocado.render.shaders.utils.ShaderProgram;
 import com.avogine.westocado.render.shaders.utils.Uniform;
 import com.avogine.westocado.render.shaders.utils.UniformFloat;
+import com.avogine.westocado.render.shaders.utils.UniformMat4Array;
 import com.avogine.westocado.render.shaders.utils.UniformMatrix;
 import com.avogine.westocado.render.shaders.utils.UniformSampler;
 import com.avogine.westocado.render.shaders.utils.UniformVec3;
@@ -15,11 +16,13 @@ import com.avogine.westocado.render.shaders.utils.UniformVec4;
 public class ObjectShader extends ShaderProgram {
 
 	public static final int MAX_LIGHTS = 10;
+	public static final int MAX_JOINTS = 150;
 	private static final int DIFFUSE_TEX_UNIT = 0;
 	
 	public UniformMatrix model = new UniformMatrix("model");
 	public UniformMatrix projection = new UniformMatrix("projection");
 	public UniformMatrix view = new UniformMatrix("view");
+	public UniformMat4Array jointsMatrix = new UniformMat4Array("jointsMatrix", MAX_JOINTS);
 	public UniformSampler texture = new UniformSampler("tex");
 	public UniformVec3 cameraPosition = new UniformVec3("cameraPosition");
 	public UniformFloat materialShininess = new UniformFloat("materialShininess");
@@ -45,7 +48,7 @@ public class ObjectShader extends ShaderProgram {
 		}
 		// WEW
 		List<Uniform> uniformList = new ArrayList<>();
-		uniformList.addAll(Arrays.asList(projection, view, model, texture, cameraPosition, materialShininess, materialSpecularColor, numLights));
+		uniformList.addAll(Arrays.asList(projection, view, model, jointsMatrix, texture, cameraPosition, materialShininess, materialSpecularColor, numLights));
 		uniformList.addAll(Arrays.asList(lightPositions));
 		uniformList.addAll(Arrays.asList(lightIntensities));
 		uniformList.addAll(Arrays.asList(lightAttenuations));

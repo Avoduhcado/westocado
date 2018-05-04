@@ -18,6 +18,7 @@ import com.avogine.westocado.io.utils.MouseMotionInputListener;
 import com.avogine.westocado.io.utils.MouseScrollInputEvent;
 import com.avogine.westocado.io.utils.MouseScrollInputListener;
 import com.avogine.westocado.utils.system.Screenshot;
+import com.avogine.westocado.utils.system.WindowManager;
 
 public class Input {
 
@@ -71,7 +72,8 @@ public class Input {
 			case GLFW.GLFW_KEY_F12:
 				if(action == GLFW.GLFW_RELEASE) {
 					// TODO Get the actual screen size
-					System.out.println(Screenshot.saveScreenshot(new File(System.getProperty("user.dir")), 1280, 720));
+					Window win = WindowManager.requestWindow(window);
+					System.out.println(Screenshot.saveScreenshot(new File(System.getProperty("user.dir")), win.getWidth(), win.getHeight()));
 				}
 				break;
 			default:

@@ -7,31 +7,32 @@ import org.lwjgl.opengl.GL13;
 
 public class Mesh {
 
-	private static final int MAX_WEIGHTS = 4;
+	public static final int MAX_WEIGHTS = 3;
+	public static final int MAX_COLORS = 3;
 
 	private VAO vao;
 	private Material material;
 	private float boundingRadius;
 
 	public Mesh(float[] positions, float[] textureCoords, float[] normals, int[] indices) {
-		this(positions, textureCoords, normals, createEmptyFloatArray(MAX_WEIGHTS * positions.length / 3, 0), createEmptyFloatArray(MAX_WEIGHTS * positions.length / 3, 0), createEmptyIntArray(MAX_WEIGHTS * positions.length / 3, 0), indices);
+		this(positions, textureCoords, normals, createEmptyFloatArray(MAX_COLORS * positions.length / 3, 0), indices, createEmptyFloatArray(MAX_WEIGHTS * positions.length / 3, 0), createEmptyIntArray(MAX_WEIGHTS * positions.length / 3, 0));
 	}
 
-	public Mesh(float[] positions, float[] textureCoords, float[] normals, float[] color, float[] weights, int[] jointIndices, int[] indices) {
+	public Mesh(float[] positions, float[] textureCoords, float[] normals, float[] color, int[] indices, float[] weights, int[] jointIndices) {
 		calculateBoundingRadius(positions);
 
 		vao = VAO.create();
-		vao.bind(0, 1, 2, 3, 4, 5);
+		vao.bind(0, 1, 2, 3, 4);
 
 		vao.createAttribute(0, positions, 3);
 		vao.createAttribute(1, textureCoords, 2);
 		vao.createAttribute(2, normals, 3);
-		vao.createAttribute(3, color, 3);
-		vao.createAttribute(4, weights, 4);
-		vao.createIntAttribute(5, jointIndices, 4);
+		//vao.createAttribute(3, color, 3);
+		vao.createAttribute(3, weights, 3);
+		vao.createIntAttribute(4, jointIndices, 3);
 		vao.createIndexBuffer(indices);
 
-		vao.unbind(0, 1, 2, 3, 4, 5);
+		vao.unbind(0, 1, 2, 3, 4);
 	}
 
 	private void calculateBoundingRadius(float positions[]) {
@@ -82,12 +83,12 @@ public class Mesh {
 		}
 
 		// Bind VAO and attributes
-		getVao().bind(0, 1, 2);
+		getVao().bind(0, 1, 2, 3, 4);
 	}
 
 	protected void endRender() {
 		// Restore state
-		getVao().unbind(0, 1, 2);
+		getVao().unbind(0, 1, 2, 3, 4);
 	}
 
 	public void render() {

@@ -5,11 +5,14 @@ import java.util.stream.Collectors;
 
 import org.joml.Matrix4f;
 
+import com.avogine.westocado.Theater;
 import com.avogine.westocado.entities.Entities;
 import com.avogine.westocado.entities.bodies.Body;
 import com.avogine.westocado.entities.bodies.CameraBody;
 import com.avogine.westocado.entities.components.LightEmitter;
 import com.avogine.westocado.entities.models.Model;
+import com.avogine.westocado.entities.models.PlainModel;
+import com.avogine.westocado.render.data.AnimatedFrame;
 import com.avogine.westocado.render.data.Mesh;
 import com.avogine.westocado.render.shaders.ObjectShader;
 
@@ -20,6 +23,8 @@ public class ObjectRender {
 	public static final float NEAR_PLANE = 0.1f;
 	public static final float FAR_PLANE = Float.MAX_VALUE;
 
+	public double animationStep = 0;
+	
 	private CameraBody camera;
 	
 	private ObjectShader shader;
@@ -28,7 +33,8 @@ public class ObjectRender {
 	public ObjectRender(CameraBody camera) {
 		this.camera = camera;
 		
-		shader = new ObjectShader("diffuseVertShader.glsl", "diffuseFragShader.glsl", "position", "textureCoords", "normals");
+		//shader = new ObjectShader("diffuseVertShader.glsl", "diffuseFragShader.glsl", "position", "textureCoords", "normals", "weights", "jointIndices");
+		shader = new ObjectShader("testerVert.glsl", "diffuseFragShader.glsl", "position", "textureCoords", "normals", "weights", "jointIndices");
 		createProjectionMatrix();
 		shader.start();
 		shader.projection.loadMatrix(projectionMatrix);
@@ -66,7 +72,20 @@ public class ObjectRender {
 		if(modelBody != null) {
 			// TODO Organize all this stuff to get proper model view transformations
 			transform.translate(modelBody.getPosition());
-			transform.scale(modelBody.getScale());			
+			transform.scale(modelBody.getScale());
+		}
+		
+		if(model instanceof PlainModel) {
+			PlainModel pModel = (PlainModel) model;
+			if(pModel.getAnimation("") != null) {
+				AnimatedFrame frame = pModel.getAnimation("").getCurrentFrame();
+				shader.jointsMatrix.loadMatrixArray(frame.getJointMatrices());
+				animationStep += Theater.getDelta();
+				if(animationStep >= 0.075) {
+					pModel.getAnimation("").getNextFrame();
+					animationStep = 0;
+				}
+			}
 		}
 		
 		shader.materialShininess.loadFloat(10f);

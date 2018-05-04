@@ -72,10 +72,10 @@ public class Stage implements EntityContainer {
 		long entity = Entities.reserveNewEntity();
 		JBulletBodyParams bodyParams = new JBulletBodyParams(new SphereShape(1), BTUtils.vector3f(0, 50, 0), new Quat4f(0, 0, 0, 1));
 		physics.createBody(entity, bodyParams);
-		new PlainModel(entity, "robutt.obj");
+		new PlainModel(entity, "robutt7.dae");
 		
 		entity = Entities.reserveNewEntity();
-		new PlainModel(entity, "cairn.obj");
+		new PlainModel(entity, "cairn4.obj");
 		PlainBody body = new PlainBody(entity);
 		body.setPosition(new Vector3f(10, 0, 10));
 		

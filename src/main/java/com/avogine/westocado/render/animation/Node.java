@@ -1,4 +1,4 @@
-package com.avogine.westocado.render.data;
+package com.avogine.westocado.render.animation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +10,8 @@ public class Node {
 	private final List<Node> children;
 
 	private final List<Matrix4f> transformations;
+	
+	private final List<Integer> animBehaviors;
 
 	private final String name;
 
@@ -20,6 +22,7 @@ public class Node {
 		this.parent = parent;
 		this.transformations = new ArrayList<>();
 		this.children = new ArrayList<>();
+		this.animBehaviors = new ArrayList<>();
 	}
 
 	public static Matrix4f getParentTransforms(Node node, int framePos) {
@@ -47,6 +50,10 @@ public class Node {
 
 	public void addTransformation(Matrix4f transformation) {
 		transformations.add(transformation);
+	}
+	
+	public void addAnimBehavior(int animBehavior) {
+		animBehaviors.add(animBehavior);
 	}
 
 	public Node findByName(String targetName) {

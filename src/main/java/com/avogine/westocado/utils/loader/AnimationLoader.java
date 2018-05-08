@@ -17,10 +17,10 @@ import org.lwjgl.assimp.AIScene;
 import org.lwjgl.assimp.AIVector3D;
 import org.lwjgl.assimp.AIVectorKey;
 
-import com.avogine.westocado.render.data.AnimatedFrame;
-import com.avogine.westocado.render.data.Animation;
-import com.avogine.westocado.render.data.Bone;
-import com.avogine.westocado.render.data.Node;
+import com.avogine.westocado.render.animation.AnimatedFrame;
+import com.avogine.westocado.render.animation.Animation;
+import com.avogine.westocado.render.animation.Bone;
+import com.avogine.westocado.render.animation.Node;
 import com.avogine.westocado.utils.AssimpUtils;
 
 public class AnimationLoader {
@@ -52,7 +52,7 @@ public class AnimationLoader {
 				Node node = rootNode.findByName(nodeName);
 				buildTransformationMatrices(aiNodeAnim, node);
 			}
-
+			
 			List<AnimatedFrame> frames = buildAnimationFrames(boneList, rootNode, rootTransformation);
 			Animation animation = new Animation(aiAnimation.mName().dataString(), frames, aiAnimation.mDuration());
 			animations.put(animation.getName(), animation);
@@ -99,6 +99,10 @@ public class AnimationLoader {
 			}
 
 			node.addTransformation(transfMat);
+			
+			int animBehavior = aiNodeAnim.mPreState();
+			
+			node.addAnimBehavior(animBehavior);
 		}
 	}
 

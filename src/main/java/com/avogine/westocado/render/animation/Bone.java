@@ -1,4 +1,4 @@
-package com.avogine.westocado.render.data;
+package com.avogine.westocado.render.animation;
 
 import org.joml.Matrix4f;
 

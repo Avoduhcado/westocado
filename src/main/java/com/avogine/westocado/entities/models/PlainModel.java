@@ -2,7 +2,7 @@ package com.avogine.westocado.entities.models;
 
 import java.util.Map;
 
-import com.avogine.westocado.render.data.Animation;
+import com.avogine.westocado.render.animation.Animation;
 import com.avogine.westocado.render.data.Mesh;
 import com.avogine.westocado.utils.loader.MeshLoader;
 import com.avogine.westocado.utils.system.AvoEvent;
@@ -22,7 +22,7 @@ public class PlainModel extends Model {
 			animationMap = meshAnimationPair.getSecond();
 			
 			for(Animation a : animationMap.values()) {
-				System.out.println(a.getFrames().size());
+				System.out.println(a.getName() + " " + a.getFrames().size());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

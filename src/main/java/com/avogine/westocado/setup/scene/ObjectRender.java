@@ -5,14 +5,13 @@ import java.util.stream.Collectors;
 
 import org.joml.Matrix4f;
 
-import com.avogine.westocado.Theater;
 import com.avogine.westocado.entities.Entities;
 import com.avogine.westocado.entities.bodies.Body;
 import com.avogine.westocado.entities.bodies.CameraBody;
 import com.avogine.westocado.entities.components.LightEmitter;
 import com.avogine.westocado.entities.models.Model;
 import com.avogine.westocado.entities.models.PlainModel;
-import com.avogine.westocado.render.data.AnimatedFrame;
+import com.avogine.westocado.render.animation.AnimatedFrame;
 import com.avogine.westocado.render.data.Mesh;
 import com.avogine.westocado.render.shaders.ObjectShader;
 
@@ -22,8 +21,6 @@ public class ObjectRender {
 	public static final float FOV = 70;
 	public static final float NEAR_PLANE = 0.1f;
 	public static final float FAR_PLANE = Float.MAX_VALUE;
-
-	public double animationStep = 0;
 	
 	private CameraBody camera;
 	
@@ -78,13 +75,10 @@ public class ObjectRender {
 		if(model instanceof PlainModel) {
 			PlainModel pModel = (PlainModel) model;
 			if(pModel.getAnimation("") != null) {
-				AnimatedFrame frame = pModel.getAnimation("").getCurrentFrame();
+				// Lol should tweened animations be a toggleable option? CAN'T BE CHEAP TO COMPUTE
+				AnimatedFrame frame = pModel.getAnimation("").getCurrentFrameTweened();
 				shader.jointsMatrix.loadMatrixArray(frame.getJointMatrices());
-				animationStep += Theater.getDelta();
-				if(animationStep >= 0.075) {
-					pModel.getAnimation("").getNextFrame();
-					animationStep = 0;
-				}
+				pModel.getAnimation("").animate();
 			}
 		}
 		

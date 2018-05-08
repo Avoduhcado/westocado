@@ -23,12 +23,12 @@ import org.lwjgl.assimp.AIVector3D;
 import org.lwjgl.assimp.AIVertexWeight;
 import org.lwjgl.assimp.Assimp;
 
-import com.avogine.westocado.render.data.Animation;
-import com.avogine.westocado.render.data.Bone;
+import com.avogine.westocado.render.animation.Animation;
+import com.avogine.westocado.render.animation.Bone;
+import com.avogine.westocado.render.animation.VertexWeight;
 import com.avogine.westocado.render.data.Material;
 import com.avogine.westocado.render.data.Mesh;
 import com.avogine.westocado.render.data.Texture;
-import com.avogine.westocado.render.data.VertexWeight;
 import com.avogine.westocado.render.utils.TextureCache;
 import com.avogine.westocado.utils.AssimpUtils;
 import com.avogine.westocado.utils.system.Pair;

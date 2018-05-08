@@ -13,6 +13,7 @@ uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
 uniform mat4 jointsMatrix[MAX_JOINTS];
+uniform float frameDuration;
 
 out vec3 fragVert;
 out vec2 fragTextureCoords;

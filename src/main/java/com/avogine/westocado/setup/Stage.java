@@ -8,12 +8,11 @@ import org.lwjgl.opengl.GL30;
 
 import com.avogine.westocado.Theater;
 import com.avogine.westocado.entities.Entities;
-import com.avogine.westocado.entities.bodies.CameraBody;
 import com.avogine.westocado.entities.bodies.JBulletBody;
 import com.avogine.westocado.entities.bodies.PlainBody;
 import com.avogine.westocado.entities.bodies.utils.JBulletBodyParams;
 import com.avogine.westocado.entities.components.LightEmitter;
-import com.avogine.westocado.entities.controllers.CameraController;
+import com.avogine.westocado.entities.controllers.CharacterController;
 import com.avogine.westocado.entities.models.PlainModel;
 import com.avogine.westocado.entities.utils.EntityContainer;
 import com.avogine.westocado.io.Window;
@@ -42,6 +41,7 @@ public class Stage implements EntityContainer {
 	public static final float BLUE = 0.69f;*/
 	
 	private Window window;
+	private Camera camera;
 	
 	private FBO entityFbo;
 	private FBO outputFbo;
@@ -59,20 +59,21 @@ public class Stage implements EntityContainer {
 		outputFbo = new FBO(window.getFbWidth(), window.getFbHeight(), FBO.DEPTH_TEXTURE, window);
 		PostProcessor.init(window);
 		
-		long cameraEntity = Entities.reserveNewEntity();
-		new CameraController(cameraEntity, window);
-		new LightEmitter(cameraEntity, new Vector3f(0.9f, 0.3f, 0.1f));
-		CameraBody mainCamera = new CameraBody(cameraEntity);
+		long mainCamera = Entities.reserveNewEntity();
+		this.camera = new Camera(mainCamera, window);
+		//new CameraController(mainCamera, window);
+		new LightEmitter(mainCamera, new Vector3f(0.9f, 0.3f, 0.1f));
 
 		// TODO Could probably wrap these up inside some sort of full renderer to cut down on code duplication
-		this.render = new ObjectRender(mainCamera);
-		this.vRender = new VertexRender(mainCamera);
+		this.render = new ObjectRender();
+		this.vRender = new VertexRender();
 		
 		// This is all garbo entity creation and should DEFO be hid behind a level loader
 		long entity = Entities.reserveNewEntity();
 		JBulletBodyParams bodyParams = new JBulletBodyParams(new SphereShape(1), BTUtils.vector3f(0, 50, 0), new Quat4f(0, 0, 0, 1));
-		physics.createBody(entity, bodyParams);
-		new PlainModel(entity, "robutt7.dae");
+		camera.setFocus(physics.createBody(entity, bodyParams));
+		new CharacterController(entity, window);
+		new PlainModel(entity, "robutt7.fbx");
 		
 		entity = Entities.reserveNewEntity();
 		new PlainModel(entity, "cairn4.obj");
@@ -95,14 +96,15 @@ public class Stage implements EntityContainer {
 	 * Renders the scene to the screen.
 	 */
 	public void render() {
+		camera.updateViewMatrix();
 		prepare();
 		entityFbo.bindFrameBuffer();
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 		if(Theater.wireFrame) {
 			GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
 		}
-		render.renderScene();
-		vRender.renderScene();
+		render.renderScene(camera);
+		vRender.renderScene(camera);
 		if(Theater.wireFrame) {
 			GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
 		}
@@ -134,7 +136,7 @@ public class Stage implements EntityContainer {
 	 * Prepare to render the current frame by clearing the framebuffer.
 	 */
 	private void prepare() {
-		GL11.glClearColor(WHITE.x, WHITE.y, WHITE.z, 1);
+		GL11.glClearColor(CORNFLOUR_BLUE.x, CORNFLOUR_BLUE.y, CORNFLOUR_BLUE.z, 1);
 		//GL11.glClearColor(CORNFLOUR_BLUE.x, CORNFLOUR_BLUE.y, CORNFLOUR_BLUE.z, 1);
 		//GL11.glClearColor(BLACK.x, BLACK.y, BLACK.z, 1);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);

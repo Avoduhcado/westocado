@@ -1,25 +1,26 @@
 package com.avogine.westocado.entities;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.avogine.westocado.entities.bodies.Body;
 import com.avogine.westocado.entities.components.EntityComponent;
 import com.avogine.westocado.entities.components.LightEmitter;
 import com.avogine.westocado.entities.controllers.Controller;
 import com.avogine.westocado.entities.models.Model;
+import com.avogine.westocado.entities.states.State;
+import com.avogine.westocado.entities.utils.EntityComponentMap;
 
 public class Entities {
 
 	private static long entityCount = 0;
 	private static List<Long> entityList = new ArrayList<>();
 	
-	public static Map<Long, Body> bodyComponentMap = new HashMap<>();
-	public static Map<Long, Model> modelComponentMap = new HashMap<>();
-	public static Map<Long, Controller> controllerComponentMap = new HashMap<>();
-	public static Map<Long, LightEmitter> lightComponentMap = new HashMap<>();
+	public static EntityComponentMap<Body> bodyComponentMap = new EntityComponentMap<>();
+	public static EntityComponentMap<Model> modelComponentMap = new EntityComponentMap<>();
+	public static EntityComponentMap<Controller> controllerComponentMap = new EntityComponentMap<>();
+	public static EntityComponentMap<LightEmitter> lightComponentMap = new EntityComponentMap<>();
+	public static EntityComponentMap<State> stateComponentMap = new EntityComponentMap<>();
 	
 	public static long getNewEntity() {
 		return entityCount++;
@@ -47,6 +48,8 @@ public class Entities {
 			controllerComponentMap.put(entity, (Controller) component);
 		} else if(component instanceof LightEmitter) {
 			lightComponentMap.put(entity, (LightEmitter) component);
+		} else if(component instanceof State) {
+			stateComponentMap.put(entity, (State) component);
 		} else {
 			System.err.println("Trying to register a component of type: '" + component.getClass() + "' for entity: '" + entity + "' but there's no available component map.");
 		}

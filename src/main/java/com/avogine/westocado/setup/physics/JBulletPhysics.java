@@ -9,6 +9,7 @@ import com.avogine.westocado.entities.bodies.utils.JBulletBodyParams;
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
 import com.bulletphysics.collision.broadphase.DbvtBroadphase;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
+import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.StaticPlaneShape;
@@ -47,6 +48,7 @@ public class JBulletPhysics extends PhysicsController<JBulletBody, JBulletBodyPa
 		groundTransform.setRotation(new Quat4f(0, 0, 0, 1));
 		DefaultMotionState groundMotionState = new DefaultMotionState(groundTransform);
 		RigidBodyConstructionInfo groundRigidBodyConstructionInfo = new RigidBodyConstructionInfo(0, groundMotionState, groundShape, new Vector3f(0, 0, 0));
+		groundRigidBodyConstructionInfo.restitution = 0.25f;
 		RigidBody groundRigidBody = new RigidBody(groundRigidBodyConstructionInfo);
 		world.addRigidBody(groundRigidBody);
 		
@@ -76,7 +78,11 @@ public class JBulletPhysics extends PhysicsController<JBulletBody, JBulletBodyPa
 		Vector3f inertia = params.getInertia();
 		shape.calculateLocalInertia(mass, inertia);
 		RigidBodyConstructionInfo rigidBodyConstructionInfo = new RigidBodyConstructionInfo(mass, motionState, shape, inertia);
+		// TODO Params
+		rigidBodyConstructionInfo.restitution = 0.5f;
+		rigidBodyConstructionInfo.angularDamping = 0.95f;
 		RigidBody rigidBody = new RigidBody(rigidBodyConstructionInfo);
+		rigidBody.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
 		
 		world.addRigidBody(rigidBody);
 		

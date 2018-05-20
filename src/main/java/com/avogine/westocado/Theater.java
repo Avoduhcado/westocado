@@ -5,6 +5,7 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 
 import com.avogine.westocado.io.Window;
 import com.avogine.westocado.io.utils.TimeEvent;
+import com.avogine.westocado.system.AvoEventQueue;
 import com.avogine.westocado.system.TimeWizard;
 import com.avogine.westocado.utils.system.WindowManager;
 
@@ -49,6 +50,7 @@ public class Theater {
 			window.render();
 
 			doSync();
+			doLater();
 		}
 		
 		destroy();
@@ -88,8 +90,16 @@ public class Theater {
 		}
 	}
 	
+	/**
+	 * Process events after all game loop interaction has ceased for the frame.
+	 */
+	private void doLater() {
+		AvoEventQueue.processEvents();
+	}
+	
 	private void destroy() {
 		window.destroy();
+		// End it all if we've destroyed the main window
 		if(WindowManager.requestMainWindow() == -1L) {
 			GLFW.glfwTerminate();
 		}

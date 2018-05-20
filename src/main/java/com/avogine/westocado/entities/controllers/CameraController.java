@@ -5,7 +5,6 @@ import org.lwjgl.glfw.GLFW;
 
 import com.avogine.westocado.entities.Entities;
 import com.avogine.westocado.entities.bodies.utils.MovementEvent;
-import com.avogine.westocado.entities.bodies.utils.RotationEvent;
 import com.avogine.westocado.entities.bodies.utils.SpeedChangeEvent;
 import com.avogine.westocado.io.Window;
 import com.avogine.westocado.io.utils.KeyInputEvent;
@@ -64,22 +63,22 @@ public class CameraController extends Controller implements KeyInputListener, Mo
 	public void keyHeld(KeyInputEvent e) {
 		switch(e.getKey()) {
 		case GLFW.GLFW_KEY_W:
-			Entities.bodyComponentMap.get(entity).fireEvent(new MovementEvent(new Vector3f(0, 0, -1), MovementEvent.RELATIVE));
+			Entities.bodyComponentMap.fireEventAt(entity, new MovementEvent(new Vector3f(0, 0, -1), MovementEvent.RELATIVE));
 			break;
 		case GLFW.GLFW_KEY_S:
-			Entities.bodyComponentMap.get(entity).fireEvent(new MovementEvent(new Vector3f(0, 0, 1), MovementEvent.RELATIVE));
+			Entities.bodyComponentMap.fireEventAt(entity, new MovementEvent(new Vector3f(0, 0, 1), MovementEvent.RELATIVE));
 			break;
 		case GLFW.GLFW_KEY_A:
-			Entities.bodyComponentMap.get(entity).fireEvent(new MovementEvent(new Vector3f(-1, 0, 0), MovementEvent.RELATIVE));
+			Entities.bodyComponentMap.fireEventAt(entity, new MovementEvent(new Vector3f(-1, 0, 0), MovementEvent.RELATIVE));
 			break;
 		case GLFW.GLFW_KEY_D:
-			Entities.bodyComponentMap.get(entity).fireEvent(new MovementEvent(new Vector3f(1, 0, 0), MovementEvent.RELATIVE));
+			Entities.bodyComponentMap.fireEventAt(entity, new MovementEvent(new Vector3f(1, 0, 0), MovementEvent.RELATIVE));
 			break;
 		case GLFW.GLFW_KEY_SPACE:
-			Entities.bodyComponentMap.get(entity).fireEvent(new MovementEvent(new Vector3f(0, 1, 0), MovementEvent.FIXED));
+			Entities.bodyComponentMap.fireEventAt(entity, new MovementEvent(new Vector3f(0, 1, 0), MovementEvent.FIXED));
 			break;
 		case GLFW.GLFW_KEY_LEFT_SHIFT:
-			Entities.bodyComponentMap.get(entity).fireEvent(new MovementEvent(new Vector3f(0, -1, 0), MovementEvent.FIXED));
+			Entities.bodyComponentMap.fireEventAt(entity, new MovementEvent(new Vector3f(0, -1, 0), MovementEvent.FIXED));
 			break;
 		}
 	}
@@ -123,7 +122,6 @@ public class CameraController extends Controller implements KeyInputListener, Mo
 			if(inverted) {
 				rotation.negate();
 			}
-			Entities.bodyComponentMap.get(entity).fireEvent(new RotationEvent(rotation));
 		}
 	}
 
@@ -135,7 +133,7 @@ public class CameraController extends Controller implements KeyInputListener, Mo
 
 	@Override
 	public void mouseScrolled(MouseScrollInputEvent e) {
-		Entities.bodyComponentMap.get(entity).fireEvent(new SpeedChangeEvent(e.getDy()));
+		Entities.bodyComponentMap.fireEventAt(entity, new SpeedChangeEvent(e.getDy()));
 	}
 
 	@Override

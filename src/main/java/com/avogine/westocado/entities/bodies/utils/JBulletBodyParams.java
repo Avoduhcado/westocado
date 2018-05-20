@@ -10,7 +10,7 @@ public class JBulletBodyParams extends BodyParams {
 	private CollisionShape shape;
 	private Vector3f position;
 	private Quat4f rotation;
-	private float mass = 1f;
+	private float mass = 2.5f;
 	private Vector3f inertia = new Vector3f();
 	
 	public JBulletBodyParams(CollisionShape shape, Vector3f position, Quat4f rotation) {

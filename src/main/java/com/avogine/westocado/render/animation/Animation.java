@@ -56,7 +56,7 @@ public class Animation {
 	}
 
 	public double getFrameDuration() {
-		return duration / frames.size();
+		return frames.size() / duration;
 	}
 
 	public List<AnimatedFrame> getFrames() {

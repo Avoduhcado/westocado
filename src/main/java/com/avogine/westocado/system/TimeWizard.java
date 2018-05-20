@@ -14,11 +14,11 @@ public class TimeWizard {
 		return listeners;
 	}
 	
-	public static void addListener(TimeListener l) {
+	public static synchronized void addListener(TimeListener l) {
 		listeners.add(l);
 	}
 	
-	public static void removeListener(TimeListener l) {
+	public static synchronized void removeListener(TimeListener l) {
 		listeners.remove(l);
 	}
 	

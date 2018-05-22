@@ -34,6 +34,10 @@ public class TextureCache {
 	 * @return A {@link Texture} object already loaded into the cache or null if it doesn't exist
 	 */
 	public Texture getTextureOrNull(String texturePath) {
+		if(!textureMap.containsKey(texturePath)) {
+			return null;
+		}
+		
 		return textureMap.get(texturePath);
 	}
 	
@@ -67,7 +71,8 @@ public class TextureCache {
 	}
 	
 	public static Texture loadTexture(String textureFileName) {
-		Texture texture = Texture.loadTexture(textureFileName);
+		// TODO Extract ".png" to some kinda constant I guess
+		Texture texture = new Texture(textureFileName);
 		GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
 		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
 		GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_LOD_BIAS, -0.4f);
@@ -81,4 +86,5 @@ public class TextureCache {
 				
 		return texture;
 	}
+	
 }

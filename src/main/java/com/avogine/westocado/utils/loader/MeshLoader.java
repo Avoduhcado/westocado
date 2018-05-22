@@ -1,5 +1,7 @@
 package com.avogine.westocado.utils.loader;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -13,7 +15,6 @@ import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.AIBone;
 import org.lwjgl.assimp.AIColor4D;
 import org.lwjgl.assimp.AIFace;
-import org.lwjgl.assimp.AIFileIO;
 import org.lwjgl.assimp.AIMaterial;
 import org.lwjgl.assimp.AIMesh;
 import org.lwjgl.assimp.AIScene;
@@ -30,22 +31,24 @@ import com.avogine.westocado.render.data.Mesh;
 import com.avogine.westocado.render.data.Texture;
 import com.avogine.westocado.render.utils.TextureCache;
 import com.avogine.westocado.utils.AssimpUtils;
-import com.avogine.westocado.utils.JarFile;
 import com.avogine.westocado.utils.system.Pair;
 
 public class MeshLoader {
 
 	private static final String MODEL_LOCATION = "models/";
-	private static final AIFileIO io = JarFile.createFileIO();
 
 	public static Pair<Mesh[], Map<String, Animation>> load(String resourcePath) throws Exception {
 		return load(resourcePath, Assimp.aiProcess_JoinIdenticalVertices | Assimp.aiProcess_Triangulate | Assimp.aiProcess_FixInfacingNormals | Assimp.aiProcess_LimitBoneWeights);
 	}
-	
+
 	public static Pair<Mesh[], Map<String, Animation>> load(String resourcePath, int flags) throws Exception {
-		String modelPath = MODEL_LOCATION + resourcePath;
-		
-		AIScene aiScene = Assimp.aiImportFileEx(modelPath, flags, io);
+		// TODO Don't package resources with jar, OR look into why Assimp won't load files from the jar (prolly the former TBH)
+		File assimpFile = new File(ClassLoader.getSystemResource(MODEL_LOCATION + resourcePath).getFile());
+		if(!assimpFile.exists()) {
+			throw new FileNotFoundException("No such file at " + MODEL_LOCATION + resourcePath);
+		}
+
+		AIScene aiScene = Assimp.aiImportFile(assimpFile.getAbsolutePath(), flags);
 		if (aiScene == null) {
 			throw new Exception("Error loading model");
 		}

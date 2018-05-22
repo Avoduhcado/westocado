@@ -6,106 +6,105 @@ public class Material {
 
 	public static final Vector4f DEFAULT_COLOR = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-	private Vector4f ambientColor;
+    private Vector4f ambientColor;
 
-	private Vector4f diffuseColor;
+    private Vector4f diffuseColor;
 
-	private Vector4f specularColor;
+    private Vector4f specularColor;
+    
+    private float shininess;
 
-	private float shininess;
+    private float reflectance;
 
-	private float reflectance;
+    private Texture texture;
+    
+    private Texture normalMap;
 
-	private Texture texture;
+    public Material() {
+        this.ambientColor = DEFAULT_COLOR;
+        this.diffuseColor = DEFAULT_COLOR;
+        this.specularColor = DEFAULT_COLOR;
+        this.texture = null;
+        this.reflectance = 0;
+    }
 
-	private Texture normalMap;
+    public Material(Vector4f color, float reflectance) {
+        this(color, color, color, null, reflectance);
+    }
 
-	public Material() {
-		this.ambientColor = DEFAULT_COLOR;
-		this.diffuseColor = DEFAULT_COLOR;
-		this.specularColor = DEFAULT_COLOR;
-		this.texture = null;
-		this.reflectance = 0;
-	}
+    public Material(Texture texture) {
+        this(DEFAULT_COLOR, DEFAULT_COLOR, DEFAULT_COLOR, texture, 0);
+    }
 
-	public Material(Vector4f color, float reflectance) {
-		this(color, color, color, null, reflectance);
-	}
+    public Material(Texture texture, float reflectance) {
+        this(DEFAULT_COLOR, DEFAULT_COLOR, DEFAULT_COLOR, texture, reflectance);
+    }
 
-	public Material(Texture texture) {
-		this(DEFAULT_COLOR, DEFAULT_COLOR, DEFAULT_COLOR, texture, 0);
-	}
+    public Material(Vector4f ambientColor, Vector4f diffuseColor, Vector4f specularColor, float reflectance) {
+        this(ambientColor, diffuseColor, specularColor, null, reflectance);
+    }
 
-	public Material(Texture texture, float reflectance) {
-		this(DEFAULT_COLOR, DEFAULT_COLOR, DEFAULT_COLOR, texture, reflectance);
-	}
+    public Material(Vector4f ambientColor, Vector4f diffuseColor, Vector4f specularColor, Texture texture, float reflectance) {
+        this.ambientColor = ambientColor;
+        this.diffuseColor = diffuseColor;
+        this.specularColor = specularColor;
+        this.texture = texture;
+        this.reflectance = reflectance;
+    }
 
-	public Material(Vector4f ambientColor, Vector4f diffuseColor, Vector4f specularColor, float reflectance) {
-		this(ambientColor, diffuseColor, specularColor, null, reflectance);
-	}
+    public Vector4f getAmbientColor() {
+        return ambientColor;
+    }
 
-	public Material(Vector4f ambientColor, Vector4f diffuseColor, Vector4f specularColor, Texture texture,
-			float reflectance) {
-		this.ambientColor = ambientColor;
-		this.diffuseColor = diffuseColor;
-		this.specularColor = specularColor;
-		this.texture = texture;
-		this.reflectance = reflectance;
-	}
+    public void setAmbientColor(Vector4f ambientColor) {
+        this.ambientColor = ambientColor;
+    }
 
-	public Vector4f getAmbientColor() {
-		return ambientColor;
-	}
+    public Vector4f getDiffuseColor() {
+        return diffuseColor;
+    }
 
-	public void setAmbientColor(Vector4f ambientColor) {
-		this.ambientColor = ambientColor;
-	}
+    public void setDiffuseColor(Vector4f diffuseColor) {
+        this.diffuseColor = diffuseColor;
+    }
 
-	public Vector4f getDiffuseColor() {
-		return diffuseColor;
-	}
+    public Vector4f getSpecularColor() {
+        return specularColor;
+    }
 
-	public void setDiffuseColor(Vector4f diffuseColor) {
-		this.diffuseColor = diffuseColor;
-	}
+    public void setSpecularColor(Vector4f specularColor) {
+        this.specularColor = specularColor;
+    }
 
-	public Vector4f getSpecularColor() {
-		return specularColor;
-	}
+    public float getReflectance() {
+        return reflectance;
+    }
 
-	public void setSpecularColor(Vector4f specularColor) {
-		this.specularColor = specularColor;
-	}
+    public void setReflectance(float reflectance) {
+        this.reflectance = reflectance;
+    }
 
-	public float getReflectance() {
-		return reflectance;
-	}
+    public boolean isTextured() {
+        return this.texture != null;
+    }
 
-	public void setReflectance(float reflectance) {
-		this.reflectance = reflectance;
-	}
+    public Texture getTexture() {
+        return texture;
+    }
 
-	public boolean isTextured() {
-		return this.texture != null;
-	}
+    public void setTexture(Texture texture) {
+        this.texture = texture;
+    }
+    
+    public boolean hasNormalMap() {
+        return this.normalMap != null;
+    }
 
-	public Texture getTexture() {
-		return texture;
-	}
+    public Texture getNormalMap() {
+        return normalMap;
+    }
 
-	public void setTexture(Texture texture) {
-		this.texture = texture;
-	}
-
-	public boolean hasNormalMap() {
-		return this.normalMap != null;
-	}
-
-	public Texture getNormalMap() {
-		return normalMap;
-	}
-
-	public void setNormalMap(Texture normalMap) {
-		this.normalMap = normalMap;
-	}
+    public void setNormalMap(Texture normalMap) {
+        this.normalMap = normalMap;
+}
 }

@@ -18,7 +18,6 @@ public class PlainModel extends Model {
 		super(entity);
 		try {
 			Pair<Mesh[], Map<String, Animation>> meshAnimationPair = MeshLoader.load(modelName);
-			
 			meshList = meshAnimationPair.getFirst();
 			animationMap = meshAnimationPair.getSecond();
 			

@@ -6,11 +6,27 @@ import com.avogine.westocado.utils.system.AvoEvent;
 
 public class LightEmitter extends EntityComponent {
 
-	private Vector3f color;
+	public static final int DIRECTIONAL = 0;
+	public static final int POINT = 1;
 	
-	public LightEmitter(long entity, Vector3f color) {
+	private Vector3f color;
+	private float coneAngle;
+	private Vector3f coneDirection;
+	private int lightType;
+	
+	public LightEmitter(long entity, Vector3f color, int lightType) {
 		super(entity);
 		this.color = color;
+		this.coneAngle = 0f;
+		this.coneDirection = new Vector3f();
+		this.lightType = lightType;
+	}
+	
+	public LightEmitter(long entity, Vector3f color, float coneAngle, Vector3f coneDirection) {
+		super(entity);
+		this.color = color;
+		this.coneAngle = coneAngle;
+		this.coneDirection = coneDirection;
 	}
 
 	public Vector3f getColor() {
@@ -19,6 +35,10 @@ public class LightEmitter extends EntityComponent {
 	
 	public void setColor(Vector3f color) {
 		this.color = color;
+	}
+	
+	public int getLightType() {
+		return lightType;
 	}
 
 	@Override
@@ -38,13 +58,11 @@ public class LightEmitter extends EntityComponent {
 	}
 
 	public float getConeAngle() {
-		// TODO Auto-generated method stub
-		return 0;
+		return coneAngle;
 	}
 
 	public Vector3f getConeDirection() {
-		// TODO Auto-generated method stub
-		return new Vector3f(0, 0, 0);
+		return coneDirection;
 	}
 
 }

@@ -10,6 +10,7 @@ import com.avogine.westocado.entities.controllers.Controller;
 import com.avogine.westocado.entities.models.Model;
 import com.avogine.westocado.entities.states.State;
 import com.avogine.westocado.entities.utils.EntityComponentMap;
+import com.avogine.westocado.setup.Camera;
 
 public class Entities {
 
@@ -21,6 +22,7 @@ public class Entities {
 	public static EntityComponentMap<Controller> controllerComponentMap = new EntityComponentMap<>();
 	public static EntityComponentMap<LightEmitter> lightComponentMap = new EntityComponentMap<>();
 	public static EntityComponentMap<State> stateComponentMap = new EntityComponentMap<>();
+	public static EntityComponentMap<Camera> cameraComponentMap = new EntityComponentMap<>();
 	
 	public static long getNewEntity() {
 		return entityCount++;
@@ -50,6 +52,8 @@ public class Entities {
 			lightComponentMap.put(entity, (LightEmitter) component);
 		} else if(component instanceof State) {
 			stateComponentMap.put(entity, (State) component);
+		} else if(component instanceof Camera) {
+			cameraComponentMap.put(entity, (Camera) component);
 		} else {
 			System.err.println("Trying to register a component of type: '" + component.getClass() + "' for entity: '" + entity + "' but there's no available component map.");
 		}

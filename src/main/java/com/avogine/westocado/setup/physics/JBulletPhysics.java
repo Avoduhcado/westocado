@@ -9,7 +9,6 @@ import com.avogine.westocado.entities.bodies.utils.JBulletBodyParams;
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
 import com.bulletphysics.collision.broadphase.DbvtBroadphase;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
-import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.StaticPlaneShape;
@@ -82,7 +81,7 @@ public class JBulletPhysics extends PhysicsController<JBulletBody, JBulletBodyPa
 		rigidBodyConstructionInfo.restitution = 0.5f;
 		rigidBodyConstructionInfo.angularDamping = 0.95f;
 		RigidBody rigidBody = new RigidBody(rigidBodyConstructionInfo);
-		rigidBody.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
+		//rigidBody.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
 		
 		world.addRigidBody(rigidBody);
 		

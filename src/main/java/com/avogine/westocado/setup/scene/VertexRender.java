@@ -53,7 +53,7 @@ public class VertexRender {
 		Matrix4f transform = new Matrix4f();
 		Body body = Entities.bodyComponentMap.getOrDefault(model.getEntity(), Body.DEFAULT);
 		transform.translate(body.getPosition());
-		transform.scale(body.getSize());
+		transform.scale(body.getScale());
 		
 		shader.model.loadMatrix(transform);
 		shader.view.loadMatrix(camera.getViewMatrix());

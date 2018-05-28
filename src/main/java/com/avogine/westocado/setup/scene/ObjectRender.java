@@ -95,12 +95,14 @@ public class ObjectRender {
 				
 				Body body = Entities.bodyComponentMap.getOrDefault(light.getEntity(), Body.DEFAULT);
 				// I HOPE we have a body for each light but u nvr no dood
-				shader.lightPositions[i].loadVec4(body.getPosition().x, body.getPosition().y, body.getPosition().z, 0);
+				shader.lightPositions[i].loadVec4(body.getPosition().x, body.getPosition().y, body.getPosition().z, light.getLightType());
 				shader.lightIntensities[i].loadVec3(light.getColor());
 				shader.lightAttenuations[i].loadFloat(light.getAttenuation());
 				shader.lightAmbientCoefficients[i].loadFloat(light.getAmbientCoefficient());
-				shader.lightConeAngles[i].loadFloat(light.getConeAngle());
-				shader.lightConeDirections[i].loadVec3(light.getConeDirection());
+				shader.lightConeAngles[i].loadFloat(body.getPitch());
+				shader.lightConeDirections[i].loadVec3(body.getRotation());
+				//shader.lightConeAngles[i].loadFloat(light.getConeAngle());
+				//shader.lightConeDirections[i].loadVec3(light.getConeDirection());
 			} else {
 				// Load up some bots if we ran out
 				shader.lightPositions[i].loadVec4(0, 0, 0, 0);

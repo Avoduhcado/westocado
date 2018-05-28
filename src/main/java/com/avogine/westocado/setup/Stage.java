@@ -62,7 +62,7 @@ public class Stage implements EntityContainer {
 		long mainCamera = Entities.reserveNewEntity();
 		this.camera = new Camera(mainCamera, window);
 		//new CameraController(mainCamera, window);
-		new LightEmitter(mainCamera, new Vector3f(0.9f, 0.3f, 0.1f));
+		//new LightEmitter(mainCamera, new Vector3f(0.9f, 0.3f, 0.1f), LightEmitter.POINT);
 
 		// TODO Could probably wrap these up inside some sort of full renderer to cut down on code duplication
 		this.render = new ObjectRender();
@@ -74,6 +74,7 @@ public class Stage implements EntityContainer {
 		camera.setFocus(physics.createBody(entity, bodyParams));
 		new CharacterController(entity, window);
 		new PlainModel(entity, "robutt7.fbx");
+		new LightEmitter(entity, new Vector3f(0.9f, 0.3f, 0.1f), LightEmitter.POINT);
 		
 		entity = Entities.reserveNewEntity();
 		new PlainModel(entity, "cairn4.obj");
@@ -88,8 +89,8 @@ public class Stage implements EntityContainer {
 		
 		entity = Entities.reserveNewEntity();
 		body = new PlainBody(entity);
-		body.setPosition(new Vector3f(0, 25, 25));
-		new LightEmitter(entity, new Vector3f(0.1f, 0.8f, 0f));
+		body.setPosition(new Vector3f(25, 10, 10));
+		new LightEmitter(entity, new Vector3f(0.5f, 0.5f, 0.5f), LightEmitter.DIRECTIONAL);
 	}
 
 	/**

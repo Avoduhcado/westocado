@@ -51,6 +51,7 @@ public class Camera extends EntityComponent implements MouseMotionInputListener,
 		pitch = 22.5f;
 		yaw = defaultYaw;
 		followRadius = 25;
+		// THERE MUST ALWAYS BE A LICHCAMERA
 		setFocus(new CameraBody(entity));
 	}
 	
@@ -78,27 +79,26 @@ public class Camera extends EntityComponent implements MouseMotionInputListener,
 
 	@Override
 	public void fireEvent(AvoEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void mouseMoved(MouseMotionInputEvent e) {
 		if(GLFW.glfwGetInputMode(WindowManager.requestMainWindow(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_DISABLED) {
 			pitch = MathUtils.clamp((float) (pitch - (e.getDy() / 10)), -65, 80);
+			pitch %= 360;
 		}
 	}
 
 	@Override
 	public void mouseDragged(MouseMotionInputEvent e) {
 		pitch = MathUtils.clamp((float) (pitch - (e.getDy() / 10)), -65, 80);
+		pitch %= 360;
 		yaw += e.getDx() / 10;
+		yaw %= 360;
 	}
 
 	@Override
 	public void mouseButtonPressed(MouseButtonInputEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -107,6 +107,7 @@ public class Camera extends EntityComponent implements MouseMotionInputListener,
 			@Override
 			public void timePassed(TimeEvent e) {
 				yaw = tween((float) e.getDelta());
+				yaw %= 360;
 			}
 			
 			@Override
@@ -120,8 +121,6 @@ public class Camera extends EntityComponent implements MouseMotionInputListener,
 
 	@Override
 	public void mouseButtonHeld(MouseButtonInputEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

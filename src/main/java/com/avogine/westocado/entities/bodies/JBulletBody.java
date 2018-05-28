@@ -78,6 +78,7 @@ public class JBulletBody extends Body implements BodyListener {
 
 	@Override
 	public void move(MovementEvent e) {
+		// TODO Everything blows up if you hold down 2 keys and let go, you start sliding
 		velocity.add(e.getVelocity());
 		// If the length is 0, the body should be stopped, no need to normalize (other wise it'll divide by 0 in the normalize)
 		if(velocity.length() != 0) {

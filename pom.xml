@@ -9,8 +9,8 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<lwjgl.version>3.1.1</lwjgl.version>
-		<joml.version>1.9.2</joml.version>
+		<lwjgl.version>3.1.6</lwjgl.version>
+		<joml.version>1.9.9</joml.version>
 		<lwjgl.natives>natives-windows</lwjgl.natives>
 	</properties>
 
